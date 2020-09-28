@@ -1,7 +1,7 @@
 const express = require('express');
 var app = express();
 //const port = 9000;
-const PORT = process.env.PORT || 8080;
+const port = process.env.PORT || 9000;
 const bodyParser = require('body-parser');
 // web browser driver
 const puppeteer = require('puppeteer');
@@ -9,14 +9,20 @@ const baseUrl = 'https://www.iec.co.il/businessclients/pages/smp.aspx?Date=';
 
 app.use(bodyParser.json()); // parse application/json
 
+app.get('/', function (request, response) {
+	response.status(200).json({ test: 'OK' });
+});
+
 app.get('/:date/', function (request, response) {
 	let date = request.params.date;
 	transformedDate = date.replace(/-/g, '/');
 	let url = baseUrl + transformedDate;
 
+	let browserReference;
 	puppeteer
 		.launch()
 		.then(function (browser) {
+			browserReference = browser;
 			return browser.newPage();
 		})
 		.then(function (page) {
@@ -26,7 +32,12 @@ app.get('/:date/', function (request, response) {
 		})
 		.then(parseHTML2JSON)
 		.then((data) => {
-			console.log(data);
+			browserReference
+				.close()
+				.then(() => console.log('Puppeteer browser closed!'))
+				.catch((err) => {
+					console.log('Can not close puppeteer browser!', err);
+				});
 			response.status(200).json(data);
 		})
 		.catch(function (err) {
