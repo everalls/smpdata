@@ -1,6 +1,7 @@
 const express = require('express');
 var app = express();
-const port = 9000;
+//const port = 9000;
+const PORT = process.env.PORT || 8080;
 const bodyParser = require('body-parser');
 // web browser driver
 const puppeteer = require('puppeteer');
