@@ -32,14 +32,16 @@ app.get('/:date/', function (request, response) {
 		})
 		.then(parseHTML2JSON)
 		.then((data) => {
+			response.status(200).json(data);
+		})
+		.then(() =>
 			browserReference
 				.close()
 				.then(() => console.log('Puppeteer browser closed!'))
 				.catch((err) => {
 					console.log('Can not close puppeteer browser!', err);
-				});
-			response.status(200).json(data);
-		})
+				})
+		)
 		.catch(function (err) {
 			response.status(503, 'Internal Error').send(err);
 			console.log('Error:::', err);
